@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>d3 test</title>
+	<style>
+		/* center */
+		body {
+			margin: 0 auto;
+			width: 80%;
+		}
+		.bar {
+			display: inline-block;
+			margin-right: 2px;
+			width: 20px;
+			height: 75px;
+			background-color: teal;
+		}
+	</style>
+	<script src="lib/d3.min.js?3.3.0"></script>
+</head>
+<body>
+	<script>
+		// from http://alignedleft.com/tutorials/d3/drawing-svgs
+		var dataset = [ 5, 10, 15, 20, 25 ],
+				w = 500,
+				h = 50;
+		var svg = d3.select("body")
+						    .append("svg")
+						    .attr("width", w)
+						    .attr("height", h);
+
+		var circles = svg.selectAll("circle")
+	                 .data(dataset)
+	                 .enter()
+	                 .append("circle");
+
+	  circles.attr("cx", function(d, i) {
+	      return (i * 50) + 25;
+	  })
+	  .attr("cy", h/2)
+	  .attr("r", function(d) {
+	    return d;
+	  })
+	  .attr("fill", "yellow")
+		.attr("stroke", "orange")
+		.attr("stroke-width", function(d) {
+		    return d/2;
+		});
+
+
+
+
+		// from http://alignedleft.com/tutorials/d3/the-power-of-data
+		// var dataset = [];  						 //Initialize empty array
+		// for (var i = 0; i < 25; i++) {			 //Loop 25 times
+		// 	var newNumber = Math.random() * 30;  //New random number (0-30)
+		// 	dataset = dataset.concat(newNumber); //Add new number to array
+		// }
+		// d3.select("body")
+		// 	.selectAll("p")
+	 //    .data(dataset)
+	 //    .enter()
+	 //    .append("div")
+	 //    .attr("class", "bar")
+	 //    .style("height", function(d) {
+	 //    	var barHeight = d *5;
+		// 	  return barHeight + "px";
+		// 	});
+	</script>
+</body>
+</html>
