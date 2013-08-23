@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>d3 test</title>
+	<title>d3 circles</title>
 	<style>
 		/* center */
 		body {
@@ -29,6 +29,7 @@
 						    .attr("width", w)
 						    .attr("height", h);
 
+
 		var circles = svg.selectAll("circle")
 	                 .data(dataset)
 	                 .enter()
@@ -46,26 +47,6 @@
 		.attr("stroke-width", function(d) {
 		    return d/2;
 		});
-
-
-
-
-		// from http://alignedleft.com/tutorials/d3/the-power-of-data
-		// var dataset = [];  						 //Initialize empty array
-		// for (var i = 0; i < 25; i++) {			 //Loop 25 times
-		// 	var newNumber = Math.random() * 30;  //New random number (0-30)
-		// 	dataset = dataset.concat(newNumber); //Add new number to array
-		// }
-		// d3.select("body")
-		// 	.selectAll("p")
-	 //    .data(dataset)
-	 //    .enter()
-	 //    .append("div")
-	 //    .attr("class", "bar")
-	 //    .style("height", function(d) {
-	 //    	var barHeight = d *5;
-		// 	  return barHeight + "px";
-		// 	});
 	</script>
 </body>
 </html>
