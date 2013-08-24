@@ -74,7 +74,12 @@
       //   });
 
       // start animation
-      win.repeater = win.setInterval(change, 1250);
+      win.stopAnimation = function() {
+        var id = win.setInterval(change, 1250);
+        return function() {
+          clearInterval(id);
+        }
+      }();
 
       function change() {
         svg.datum(dataset[nextIndex()]);
