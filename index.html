@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="utf-8">
   <title>d3 test</title>
   <style>
     /* center */
@@ -14,217 +15,94 @@
       width: 400px;
     }*/
   </style>
-  <script src="lib/d3.min.js?3.3.0"></script>
+  
 </head>
 <body>
+  <script src="lib/d3.js?3.3.0"></script>
+  <script src="dataset.js"></script>
   <script>
-    // 
-    var w = 400, //width
-        h = 400, //height
-        r = 200, //radius
-        color = d3.scale.category20c(); //builtin range of colors
+    (function(d3, doc, win, dataset) {
+      "use strict";
 
-    var dataset = [
-      [{
-        "label": "HIV",
-        "value": 100
-      }, {
-        "label": "",
-        "value": 0
-      }, {
-        "label": "",
-        "value": 0
-      }, {
-        "label": "",
-        "value": 0
-      }],
-      [{
-        "label": "Treatment",
-        "value": 80
-      }, {
-        "label": "Untreated",
-        "value": 20
-      }, {
-        "label": "",
-        "value": 0
-      }, {
-        "label": "",
-        "value": 0
-      }],
-      [{
-        "label": "Treatment",
-        "value": 70
-      }, {
-        "label": "Untreated",
-        "value": 15
-      }, {
-        "label": "Dead untreated ",
-        "value": 14
-      }, {
-        "label": "Dead treated ",
-        "value": 1
-      }],
-      [{
-        "label": "Treatment",
-        "value": 60
-      }, {
-        "label": "Untreated",
-        "value": 20
-      }, {
-        "label": "Dead untreated ",
-        "value": 18
-      }, {
-        "label": "Dead treated ",
-        "value": 2
-      }],
-      [{
-        "label": "Treatment",
-        "value": 45
-      }, {
-        "label": "Untreated",
-        "value": 30
-      }, {
-        "label": "Dead untreated ",
-        "value": 22
-      }, {
-        "label": "Dead treated ",
-        "value": 3
-      }],
-      [{
-        "label": "Treatment",
-        "value": 40
-      }, {
-        "label": "Untreated",
-        "value": 25
-      }, {
-        "label": "Dead untreated ",
-        "value": 31
-      }, {
-        "label": "Dead treated ",
-        "value": 4
-      }],
-      [{
-        "label": "Treatment",
-        "value": 25
-      }, {
-        "label": "Untreated",
-        "value": 20
-      }, {
-        "label": "Dead untreated ",
-        "value": 45
-      }, {
-        "label": "Dead treated ",
-        "value": 5
-      }]
-    ];
+      var size        = win.innerHeight, //height/width
+        radius        = size/2,
+        color         = d3.scale.category20b(), //builtin range of colors
+        nextIndex     = function(value) { // calculate the next dataset index
+                          value = value || 0;
+                          return function () {
+                            return (value++ % dataset.length);
+                          }
+                        }(),
+      //  datasetIndex  = 0,
+        pie           = d3.layout.pie()
+                        .value(function(d) { return d.value; }),
+        arc           = d3.svg.arc()
+                          .outerRadius(radius),
+        svg           = d3.select("body")
+                          .append("svg")
+                          .attr("width", size)
+                          .attr("height", size)
+                          .append("g")
+                          .attr("transform", "translate(" + radius + "," + radius + ")"),
+        path          = svg.datum(dataset[nextIndex()])
+                          .selectAll("path")
+                          .data(pie)
+                          .enter()                          
+                          .append("g")
+                          .attr("class", "slice")
+                          .append("path")
+                          .attr("fill", function(d, i) { return color(i); })
+                          .attr("d", arc)
+                          .each(function(d) { // store the initial angles
+                            this._current = d;
+                          })
 
-    //draw(dataset[2]);
-    var chart = create(w,h,r),
-        pie = pieChart(chart, dataset[0]);
-    pie[2].data(dataset[1])
-    //pieChart(chart, dataset[1]);
-    //pieChart(chart, dataset[2]);
+      // set text
+      // svg
+      //   .selectAll("g.slice")
+      //   .insert("text") //add a label to each slice
+      //   .attr("transform", function (d) { //set the label's origin to the center of the arc
+      //     //we have to make sure to set these before calling arc.centroid
+      //     d.innerRadius = 0;
+      //     d.outerRadius = radius;
+      //     return "translate(" + arc.centroid(d) + ")"; //this gives us a pair of coordinates like [50, 50]
+      //   })
+      //   .attr("text-anchor", "middle") //center the text on it's origin
+      //   .text(function (d) {
+      //     var value = d.data.value;
+      //     return value < 100 && value > 0 ? d.data.label : "";
+      //   });
 
-    function create(w, h, r) {
-      return [
-        d3
-        .select("body")
-        .append("svg:svg")
-        .attr("width", w) //set the width and height of our visualization (these will be attributes of the <svg> tag
-        .attr("height", h)
-        .append("svg:g") //make a group to hold our pie chart
-        .attr("transform", "translate(" + r + "," + r + ")") //move the center of the pie chart from 0, 0 to radius, radiuss
-      ,
-        d3.svg.arc() //this will create <path> elements for us using arc data
-        .outerRadius(r)
-      ,
-        d3.layout.pie() //this will create arc data for us given a list of values
-          .value(function (d) {
-              return d.value;
-          }) //we must tell it out to access the value of each element in our data array
-      ]
-    }
+      // start animation
+      win.repeater = win.setInterval(change, 1250);
 
-    function pieChart(elements, data, duration) {
-      duration = duration || 2000;
-      var vis = elements[0]
-      vis
-        .data([data])
-        .transition()
-        .duration(duration);
-
-      var arc = elements[1];
-
-      var pie = elements[2];
-
-      var arcs = vis.selectAll("g.slice") //this selects all <g> elements with class slice (there aren't any yet)
-        .data(pie) //associate the generated pie data (an array of arcs, each having startAngle, endAngle and value properties)
-        .enter() //this will create <g> elements for every "extra" data element that should be associated with a selection. The result is creating a <g> for every object in the data array
-        .append("svg:g") //create a group to hold each slice (we will have a <path> and a <text> element associated with each slice)
-        .attr("class", "slice") //allow us to style things in the slices (like text)
-        .each(function(d) { this._current = d; });
-
-      arcs.append("svg:path")
-        .attr("fill", function (d, i) {
-            return color(i);
-        }) //set the color for each slice to be chosen from the color function defined above
-        .attr("d", arc); //this creates the actual SVG path using the associated data (pie) with the arc drawing function
-
-      arcs.append("svg:text") //add a label to each slice
-      .attr("transform", function (d) { //set the label's origin to the center of the arc
-        //we have to make sure to set these before calling arc.centroid
-        d.innerRadius = 0;
-        d.outerRadius = r;
-        return "translate(" + arc.centroid(d) + ")"; //this gives us a pair of coordinates like [50, 50]
-      })
-      .attr("text-anchor", "middle") //center the text on it's origin
-      .text(function (d) {
-          return d.data.label;
-      });
-    }
-
-    function draw(data) {
-      var chart = d3.select("body")
-        .append("svg:svg") //create the SVG element inside the <body>
-        .data([ data ]) //associate our data with the document
-        .attr("width", w) //set the width and height of our visualization (these will be attributes of the <svg> tag
-        .attr("height", h)
-        .append("svg:g") //make a group to hold our pie chart
-        .attr("transform", "translate(" + r + "," + r + ")") //move the center of the pie chart from 0, 0 to radius, radius
-
-      var arc = d3.svg.arc() //this will create <path> elements for us using arc data
-        .outerRadius(r);
-
-      var pie = d3.layout.pie() //this will create arc data for us given a list of values
-        .value(function (d) {
-            return d.value;
-        }); //we must tell it out to access the value of each element in our data array
-
-      var arcs = vis.selectAll("g.slice") //this selects all <g> elements with class slice (there aren't any yet)
-        .data(pie) //associate the generated pie data (an array of arcs, each having startAngle, endAngle and value properties)
-        .enter() //this will create <g> elements for every "extra" data element that should be associated with a selection. The result is creating a <g> for every object in the data array
-        .append("svg:g") //create a group to hold each slice (we will have a <path> and a <text> element associated with each slice)
-        .attr("class", "slice"); //allow us to style things in the slices (like text)
-
-      arcs.append("svg:path")
-        .attr("fill", function (d, i) {
-            return color(i);
-        }) //set the color for each slice to be chosen from the color function defined above
-        .attr("d", arc); //this creates the actual SVG path using the associated data (pie) with the arc drawwing function
-
-      arcs.append("svg:text") //add a label to each slice
-        .attr("transform", function (d) { //set the label's origin to the center of the arc
-          //we have to make sure to set these before calling arc.centroid
-          d.innerRadius = 0;
-          d.outerRadius = r;
-          return "translate(" + arc.centroid(d) + ")"; //this gives us a pair of coordinates like [50, 50]
-        })
-        .attr("text-anchor", "middle") //center the text on it's origin
-        .text(function (d) {
-            return d.data.label;
-        });
-        return elements;
+      function change() {
+        svg.datum(dataset[nextIndex()]);
+        path.data(pie);
+        path.transition().duration(750).attrTween("d", arcTween); // redraw the arcs
       }
+
+      // Store the displayed angles in _current.
+      // Then, interpolate from _current to the new angles.
+      // During the transition, _current is updated in-place by d3.interpolate.
+      function arcTween(a) {
+        var i = d3.interpolate(this._current, a);
+        this._current = i(0);
+        // d3
+        //   .select(this.nextSibling)
+        //   .attr("transform", function (d) { //set the label's origin to the center of the arc
+        //     return "translate(" + arc.centroid(d) + ")"; //this gives us a pair of coordinates like [50, 50]
+        //   })
+        //   .attr("text-anchor", "middle") //center the text on it's origin
+        //   .text(function (d) {
+        //       return d.data.label;
+        //   });
+        return function(t) {
+          return arc(i(t));
+        };
+      }
+      
+    }(d3, document, window, dataset));
     </script>
   </body>
 </html>
