@@ -49,18 +49,26 @@
                           .data(pie)
                           .enter()                          
                           .append("g")
-                          .attr("class", "slice")
+                          .attr("class", "sector")
                           .append("path")
                           .attr("fill", function(d, i) { return color(i); })
                           .attr("d", arc)
                           .each(function(d) { // store the initial angles
                             this._current = d;
-                          })
+                          }),
+        text          = d3.selectAll("g.sector")
+                          .append("text")
+                          .text(setText);
 
+      function setText(d) {
+        var d = d.data || d,
+            value = d.value;
+        return value < 100 && value > 0 ? d.label : "";
+      }
       // set text
       // svg
-      //   .selectAll("g.slice")
-      //   .insert("text") //add a label to each slice
+      //   .selectAll("g.sector")
+      //   .insert("text") //add a label to each sector
       //   .attr("transform", function (d) { //set the label's origin to the center of the arc
       //     //we have to make sure to set these before calling arc.centroid
       //     d.innerRadius = 0;
@@ -82,9 +90,19 @@
       }();
 
       function change() {
-        svg.datum(dataset[nextIndex()]);
+        var data = dataset[nextIndex()];
+        svg.datum(data);
         path.data(pie);
         path.transition().duration(750).attrTween("d", arcTween); // redraw the arcs
+        text.data(data)
+            .text(setText)
+            .attr("transform", function (d) {
+              // we have to make sure to set these before calling arc.centroid
+              d.innerRadius = 0;
+              d.outerRadius = radius;
+              return "translate(" + arc.centroid(d) + ")"; //this gives us a pair of coordinates like [50, 50]
+            })
+            .attr("text-anchor", "middle") //center the text on it's origin
       }
 
       // Store the displayed angles in _current.
