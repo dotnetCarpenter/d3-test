@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>static SVG - d3 test</title>
+  <style>
+    /* center */
+    body {
+      margin: 0 auto;
+      width:400px;
+    }
+  </style>  
+</head>
+<body>
+  <svg width="396" height="396"><g transform="translate(198,198)"><g class="slice"><path fill="#393b79" d="M0,198A198,198 0 1,1 0,-198A198,198 0 1,1 0,198Z"/></g><g class="slice"><path fill="#5254a3" d="M1.394873171659484e-13,-198A198,198 0 0,1 1.394873171659484e-13,-198L0,0Z"/></g><g class="slice"><path fill="#6b6ecf" d="M1.394873171659484e-13,-198A198,198 0 0,1 1.394873171659484e-13,-198L0,0Z"/></g><g class="slice"><path fill="#9c9ede" d="M1.394873171659484e-13,-198A198,198 0 0,1 1.394873171659484e-13,-198L0,0Z"/></g></g></svg>
+  <script src="lib/d3.js?3.3.0"></script>
+  <script>
+    (function(d3, doc, win) {
+      "use strict";
+      
+      var w = 300, //width
+        h = 300, //height
+        r = 100, //radius
+        color = d3.scale.category20c(), //builtin range of colors
+        data = [{
+            "label": "one",
+            "value": 20
+        }, {
+            "label": "two",
+            "value": 50
+        }, {
+            "label": "three",
+            "value": 30
+        }];
+
+        var svg = d3.select("svg")
+          .data([data])
+
+        var arc = d3.svg.arc() //this will create <path> elements for us using arc data
+          .outerRadius(r);
+
+        var pie = d3.layout.pie() //this will create arc data for us given a list of values
+          .value(function (d) {
+              return d.value;
+          }); //we must tell it out to access the value of each element in our data array
+
+        var arcs = svg.selectAll("g.slice") //this selects all <g> elements with class slice 
+          .data(pie) //associate the generated pie data (an array of arcs, each having startAngle, endAngle and value properties)
+          //.enter() //this will create <g> elements for every "extra" data element that should be associated with a selection. The result is creating a <g> for every object in the data array
+
+          arcs.append("path")
+              .attr("fill", function (d, i) {
+                  return color(i);
+              }) //set the color for each slice to be chosen from the color function defined above
+          .attr("d", arc); //this creates the actual SVG path using the associated data (pie) with the arc drawing function
+    }(d3, document, window));
+    </script>
+  </body>
+</html>
