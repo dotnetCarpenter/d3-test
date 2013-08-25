@@ -2,7 +2,7 @@
   "use strict";
   // configuration
   var size        = win.innerHeight/1.5, //height/width
-    radius        = size/2,
+    radius        = size/2, // set the radius to half the diameter
     color         = d3.scale.category20b(), //builtin range of colors
     nextIndex     = function(value) { // calculate the next dataset index
                       value = value || 0;
@@ -10,16 +10,16 @@
                         return (value++ % dataset.length);
                       }
                     }(),
-    currentDS     = dataset[nextIndex()],
-    pie           = d3.layout.pie()
+    currentDS     = dataset[nextIndex()], // maintain a local variable with our current dataset - thx d3(!)
+    pie           = d3.layout.pie() // get a pie object structure
                     .value(function(d) { return d.value; }),
     arc           = d3.svg.arc()
                       .outerRadius(radius),
-    svg           = d3.select("svg")
-                      .attr("width", size)
-                      .attr("height", size)
+    svg           = d3.select("svg") // select the SVG from the DOM
+                      .attr("width", size)  // adjust size
+                      .attr("height", size) // adjust size
                       .attr("transform", "translate(" + radius + "," + radius + ")") // move pie to center
-                      .on("click", printSvg("svgOutput")),
+                      .on("click", printSvg("svgOutput")), // setup debugging
     path          = svg.selectAll("g.sector path")
                       .data(pie(currentDS), constancy)                     
                       .attr("fill", function(d, i) {
@@ -30,14 +30,7 @@
                       }),
     text          = svg.selectAll("text")
                       .data(pie(currentDS), constancy)
-                      .attr("transform", function (d) {
-                        // we have to make sure to set these before calling arc.centroid
-                        d.innerRadius = 10;
-                        d.outerRadius = radius;
-                        // console.log("after adding in radius");
-                        // console.dir(d);
-                        return "translate(" + arc.centroid(d) + ")";
-                      })
+                      .attr("transform", moveText)
                       .text(setText)
                       .attr("text-anchor", "middle") //center the text on it's origin
 // console.dir(path)
@@ -58,7 +51,7 @@
     // console.log("data sent to the setText function");
     var d = d.data || d,
         value = d.value;
-    return value === 100 ? "HIV infected" : (value > 0 ? d.label + " " + d.value + "%" : "");
+    return value === 100 ? "HIV infected 100%" : (value > 0 ? d.label + " " + d.value + "%" : "");
   }
 
   /** 
@@ -72,27 +65,20 @@
   /**
    * Animation functions
    */
-  function change() {
-    var data = currentDS = dataset[nextIndex()];
-   // svg.datum(data);
-    path
-      .data(pie(data), constancy)
-      .transition()
-      .duration(750)
-      .attrTween("d", arcTween); // redraw the arcs
-    // console.dir(text)
-    text
-      .data(pie(data), constancy)
-      .transition()      
-      .duration(750)
-      .attr("transform", function (d) {
-        // we have to make sure to set these before calling arc.centroid
-        d.innerRadius = 10;
-        d.outerRadius = radius;
-        // // console.log("after adding in radius");
-        // console.dir(d);
-        return "translate(" + arc.centroid(d) + ")"; //this gives us a pair of coordinates like [50, 50]
-      })
+function change() {
+  var data = currentDS = dataset[nextIndex()];
+
+  path
+    .data(pie(data), constancy)
+    .transition()
+    .duration(750)
+    .attrTween("d", arcTween); // redraw the arcs
+  // console.dir(text)
+  text
+    .data(pie(data), constancy)
+    .transition()      
+    .duration(750)
+    .attr("transform", moveText)
       .text(setText)
       .attr("text-anchor", "middle") //center the text on it's origin
   }
@@ -105,6 +91,14 @@
     return function(t) {
       return arc(i(t));
     };
+  }
+  function moveText(d) {
+    // we have to make sure to set these before calling arc.centroid
+    d.innerRadius = 10;
+    d.outerRadius = radius;
+    // // console.log("after adding in radius");
+    // console.dir(d);
+    return "translate(" + arc.centroid(d) + ")"; //this gives us a pair of coordinates like [50, 50]
   }
 
   /*           *
