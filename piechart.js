@@ -65,20 +65,18 @@
   /**
    * Animation functions
    */
-function change() {
-  var data = currentDS = dataset[nextIndex()];
-
-  path
-    .data(pie(data), constancy)
-    .transition()
-    .duration(750)
-    .attrTween("d", arcTween); // redraw the arcs
-  // console.dir(text)
-  text
-    .data(pie(data), constancy)
-    .transition()      
-    .duration(750)
-    .attr("transform", moveText)
+  function change() {
+    var data = currentDS = dataset[nextIndex()];
+    path
+      .data(pie(data), constancy)
+      .transition()
+      .duration(750)
+      .attrTween("d", arcTween); // redraw the arcs
+    text
+      .data(pie(data), constancy)
+      .transition()      
+      .duration(750)
+      .attr("transform", moveText)
       .text(setText)
       .attr("text-anchor", "middle") //center the text on it's origin
   }
