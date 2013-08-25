@@ -56,6 +56,7 @@
 
   /** 
    * Object constancy
+   * http://bost.ocks.org/mike/constancy/
    * http://mbostock.github.io/d3/tutorial/bar-2.html#object_constancy
    */
   function constancy(d, i) {
