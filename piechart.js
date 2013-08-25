@@ -21,11 +21,7 @@
                       .attr("transform", "translate(" + radius + "," + radius + ")") // move pie to center
                       .on("click", printSvg("svgOutput")),
     path          = svg.selectAll("g.sector path")
-                      .data(pie(currentDS), constancy)
-                      // .enter()
-                      // .append("path")
-                    // .append("g")
-                    //   .attr("class", "sector")                      
+                      .data(pie(currentDS), constancy)                     
                       .attr("fill", function(d, i) {
                         return color(i); })
                       .attr("d", arc)
@@ -140,8 +136,8 @@
 
   function printSvg(out) {
     // print out svg
-    var out = out instanceof Element ? out : doc.getElementById(''+out),
-        serializer = new XMLSerializer(),
+    var out = out instanceof win.Element ? out : doc.getElementById(''+out),
+        serializer = new win.XMLSerializer(),
         oldNode;
     out.style.height = size + "px";
     return function() {
