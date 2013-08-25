@@ -7,125 +7,64 @@
     /* center */
     body {
       margin: 0 auto;
-      width:400px;
+      width:1000px;
     }
     /* */
-/*    fieldset, svg {
+    #svgOutput {
+      border: solid #000 1px;
+      width:49%;
+      height:20rem;
+      overflow:auto;
+    }
+    #svgOutput, img, svg {
+      box-sizing: border-box;
       display: inline-block;
-      width: 400px;
-    }*/
+      vertical-align: top;
+    }
+    svg { cursor: pointer; }
+
+    .axis text {
+      font: 10px sans-serif;
+    }
+      
+    .axis path, .axis line {
+      fill: none;
+      stroke: #000;
+      shape-rendering: crispEdges;
+    }
   </style>
   
 </head>
 <body>
+  <h1>d3 pie chart animation - test <sub>click pie to view SVG</sub></h1>
+  <form>
+    <fieldset>
+      <legend>Controls</legend>
+      <input id="btnAnimate" type="button" value="Start" />
+    </fieldset>
+  </form>
+  <code id="svgOutput"></code>
+  <!-- <img src="images/d3-test.png"> -->
+  <svg xmlns="http://www.w3.org/2000/svg" width="470" height="470" transform="translate(235,235)">
+    <g class="sector">
+        <path fill="#393b79" d="M 0 235 A 235 235 0 1 1 0 -235 A 235 235 0 1 1 0 235 Z"></path>
+        <text text-anchor="middle" transform="translate(-4.69e-014 122.5)">HIV infected</text>
+    </g>
+    <g class="sector">
+        <path fill="#5254a3" d="M 1.65553e-013 -235 A 235 235 0 0 1 1.65553e-013 -235 L 0 0 Z"></path>
+        <text></text>
+    </g>
+    <g class="sector">
+        <path fill="#6b6ecf" d="M 1.65553e-013 -235 A 235 235 0 0 1 1.65553e-013 -235 L 0 0 Z"></path>
+        <text></text>
+    </g>
+    <g class="sector">
+        <path fill="#9c9ede" d="M 1.65553e-013 -235 A 235 235 0 0 1 1.65553e-013 -235 L 0 0 Z"></path>
+        <text></text>
+    </g>
+  </svg>
   <script src="lib/d3.js?3.3.0"></script>
   <script src="dataset.js"></script>
-  <script>
-    (function(d3, doc, win, dataset) {
-      "use strict";
-
-      var size        = win.innerHeight, //height/width
-        radius        = size/2,
-        color         = d3.scale.category20b(), //builtin range of colors
-        nextIndex     = function(value) { // calculate the next dataset index
-                          value = value || 0;
-                          return function () {
-                            return (value++ % dataset.length);
-                          }
-                        }(),
-      //  datasetIndex  = 0,
-        pie           = d3.layout.pie()
-                        .value(function(d) { return d.value; }),
-        arc           = d3.svg.arc()
-                          .outerRadius(radius),
-        svg           = d3.select("body")
-                          .append("svg")
-                          .attr("width", size)
-                          .attr("height", size)
-                          .append("g")
-                          .attr("transform", "translate(" + radius + "," + radius + ")"),
-        path          = svg.datum(dataset[nextIndex()])
-                          .selectAll("path")
-                          .data(pie)
-                          .enter()                          
-                          .append("g")
-                          .attr("class", "sector")
-                          .append("path")
-                          .attr("fill", function(d, i) { return color(i); })
-                          .attr("d", arc)
-                          .each(function(d) { // store the initial angles
-                            this._current = d;
-                          }),
-        text          = d3.selectAll("g.sector")
-                          .append("text")
-                          .text(setText);
-
-      function setText(d) {
-        var d = d.data || d,
-            value = d.value;
-        return value < 100 && value > 0 ? d.label : "";
-      }
-      // set text
-      // svg
-      //   .selectAll("g.sector")
-      //   .insert("text") //add a label to each sector
-      //   .attr("transform", function (d) { //set the label's origin to the center of the arc
-      //     //we have to make sure to set these before calling arc.centroid
-      //     d.innerRadius = 0;
-      //     d.outerRadius = radius;
-      //     return "translate(" + arc.centroid(d) + ")"; //this gives us a pair of coordinates like [50, 50]
-      //   })
-      //   .attr("text-anchor", "middle") //center the text on it's origin
-      //   .text(function (d) {
-      //     var value = d.data.value;
-      //     return value < 100 && value > 0 ? d.data.label : "";
-      //   });
-
-      // start animation
-      win.stopAnimation = function() {
-        var id = win.setInterval(change, 1250);
-        return function() {
-          clearInterval(id);
-        }
-      }();
-
-      function change() {
-        var data = dataset[nextIndex()];
-        svg.datum(data);
-        path.data(pie);
-        path.transition().duration(750).attrTween("d", arcTween); // redraw the arcs
-        text.data(data)
-            .text(setText)
-            .attr("transform", function (d) {
-              // we have to make sure to set these before calling arc.centroid
-              d.innerRadius = 0;
-              d.outerRadius = radius;
-              return "translate(" + arc.centroid(d) + ")"; //this gives us a pair of coordinates like [50, 50]
-            })
-            .attr("text-anchor", "middle") //center the text on it's origin
-      }
-
-      // Store the displayed angles in _current.
-      // Then, interpolate from _current to the new angles.
-      // During the transition, _current is updated in-place by d3.interpolate.
-      function arcTween(a) {
-        var i = d3.interpolate(this._current, a);
-        this._current = i(0);
-        // d3
-        //   .select(this.nextSibling)
-        //   .attr("transform", function (d) { //set the label's origin to the center of the arc
-        //     return "translate(" + arc.centroid(d) + ")"; //this gives us a pair of coordinates like [50, 50]
-        //   })
-        //   .attr("text-anchor", "middle") //center the text on it's origin
-        //   .text(function (d) {
-        //       return d.data.label;
-        //   });
-        return function(t) {
-          return arc(i(t));
-        };
-      }
-      
-    }(d3, document, window, dataset));
-    </script>
+  <script src="piechart.js"></script>
   </body>
 </html>

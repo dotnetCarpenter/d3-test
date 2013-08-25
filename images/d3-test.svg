@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="470" height="470" transform="translate(235,235)">
+    <g class="sector">
+        <path fill="#393b79" d="M 0 235 A 235 235 0 1 1 0 -235 A 235 235 0 1 1 0 235 Z" />
+        <text text-anchor="middle" transform="translate(-4.69e-014 122.5)">HIV infected</text>
+    </g>
+    <g class="sector">
+        <path fill="#5254a3" d="M 1.65553e-013 -235 A 235 235 0 0 1 1.65553e-013 -235 L 0 0 Z" />
+        <text text-anchor="middle" transform="translate(8.6299e-014 -122.5)" />
+    </g>
+    <g class="sector">
+        <path fill="#6b6ecf" d="M 1.65553e-013 -235 A 235 235 0 0 1 1.65553e-013 -235 L 0 0 Z" />
+        <text text-anchor="middle" transform="translate(8.6299e-014 -122.5)" />
+    </g>
+    <g class="sector">
+        <path fill="#9c9ede" d="M 1.65553e-013 -235 A 235 235 0 0 1 1.65553e-013 -235 L 0 0 Z" />
+        <text text-anchor="middle" transform="translate(8.6299e-014 -122.5)" />
+    </g>
+</svg>

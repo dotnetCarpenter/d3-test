@@ -1,6 +1,6 @@
 dataset = [
   [{
-    "label": "Treatment",
+    "label": "In treatment",
     "value": 100
   }, {
     "label": "Untreated",
@@ -13,7 +13,7 @@ dataset = [
     "value": 0
   }],
   [{
-    "label": "Treatment",
+    "label": "In treatment",
     "value": 80
   }, {
     "label": "Untreated",
@@ -26,7 +26,7 @@ dataset = [
     "value": 0
   }],
   [{
-    "label": "Treatment",
+    "label": "In treatment",
     "value": 70
   }, {
     "label": "Untreated",
@@ -39,7 +39,7 @@ dataset = [
     "value": 1
   }],
   [{
-    "label": "Treatment",
+    "label": "In treatment",
     "value": 60
   }, {
     "label": "Untreated",
@@ -52,7 +52,7 @@ dataset = [
     "value": 2
   }],
   [{
-    "label": "Treatment",
+    "label": "In treatment",
     "value": 45
   }, {
     "label": "Untreated",
@@ -65,7 +65,7 @@ dataset = [
     "value": 3
   }],
   [{
-    "label": "Treatment",
+    "label": "In treatment",
     "value": 40
   }, {
     "label": "Untreated",
@@ -78,14 +78,14 @@ dataset = [
     "value": 4
   }],
   [{
-    "label": "Treatment",
+    "label": "In treatment",
     "value": 25
   }, {
     "label": "Untreated",
     "value": 20
   }, {
     "label": "Dead untreated",
-    "value": 45
+    "value": 50
   }, {
     "label": "Dead treated",
     "value": 5
