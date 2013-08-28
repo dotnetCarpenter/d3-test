@@ -1,7 +1,7 @@
 (function(d3, doc, win, dataset) {
   "use strict";
   // configuration
-  var size        = win.innerHeight/1.5, //height/width
+  var size        = (win.innerWidth*.8)/2.1, //height/width
     radius        = size/2, // set the radius to half the diameter
     color         = d3.scale.category20b(), //builtin range of colors
     nextIndex     = function(value) { // calculate the next dataset index
@@ -19,6 +19,7 @@
                       .attr("width", size)  // adjust size
                       .attr("height", size) // adjust size
                       .attr("transform", "translate(" + radius + "," + radius + ")") // move pie to center
+                      .attr("viewBox", -radius + ","+ -radius +"," + size + "," + size)
                       .on("click", printSvg("svgOutput")), // setup debugging
     path          = svg.selectAll("g.sector path")
                       .data(pie(currentDS), constancy)                     
@@ -33,9 +34,8 @@
                       .attr("transform", moveText)
                       .text(setText)
                       .attr("text-anchor", "middle") //center the text on it's origin
-// console.dir(path)
   // program
-  d3.select("#btnAnimate")
+  var btnAnimate = d3.select("#btnAnimate")
     .on("click.animate", q(run))  // start animation and set start/stop function
     .on("click.value", function() { // toggle the value on the button
       var t = toggle("Stop", "Start");
@@ -44,6 +44,23 @@
       }
     }());
 
+  d3.select("#svgOutput")
+    .attr("contentEditable", "true")
+    .on("keypress", throttle(updateSVG, 1000));
+
+  function updateSVG() {
+    if(updateSVG.updating)
+      return;
+    updateSVG.updating = true;
+    var wrapper = doc.getElementById("svgWrapper");
+    svg.remove(); // remove svg
+    wrapper.innerHTML = this.textContent; // copy text from code element to new domFragment
+    svg = d3.select(wrapper.firstChild);
+    path = svg.selectAll("g.sector path"),
+    text = svg.selectAll("text"),
+    updateSVG.updating = false;
+  }
+  updateSVG.updating = false;
   /**
    * Labels
    */
@@ -71,12 +88,12 @@
     path
       .data(pie(data), constancy)
       .transition()
-      .duration(750)
+      .duration(1000)
       .attrTween("d", arcTween); // redraw the arcs
     text
       .data(pie(data), constancy)
       .transition()      
-      .duration(750)
+      .duration(1000)
       .attr("transform", moveText)
       .text(setText)
       .attr("text-anchor", "middle") //center the text on it's origin
@@ -103,11 +120,22 @@
   /*           *
    * Utilities *
    */
+  function throttle(f, delay){
+    var timer = null;
+    return function(){
+        var context = this, args = arguments;
+        clearTimeout(timer);
+        timer = window.setTimeout(function(){
+            f.apply(context, args);
+        },
+        delay || 500);
+    };
+  }
   function run() {
     var id = win.setInterval(change, 1500);
     change();
     return function() {
-      clearInterval(id);
+      win.clearInterval(id);
       return run;
     }
   }
