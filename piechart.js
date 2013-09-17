@@ -1,39 +1,40 @@
 (function(d3, doc, win, dataset) {
   "use strict";
   // configuration
-  var size        = (win.innerWidth*.8)/2.1, //height/width
+  var size        = (win.innerWidth*0.8)/2.1, //height/width
     radius        = size/2, // set the radius to half the diameter
     color         = d3.scale.category20b(), //builtin range of colors
     nextIndex     = function(value) { // calculate the next dataset index
                       value = value || 0;
                       return function () {
                         return (value++ % dataset.length);
-                      }
+                      };
                     }(),
-    currentDS     = dataset[nextIndex()], // maintain a local variable with our current dataset - thx d3(!)
+    initialDS     = dataset[nextIndex()], // maintain a local variable with our current dataset - thx d3(!)
     pie           = d3.layout.pie() // get a pie object structure
-                    .value(function(d) { return d.value; }),
+                    .value(function(d) { return d.value; })
+                    .sort(null), // disable sort-by-value
     arc           = d3.svg.arc()
                       .outerRadius(radius),
     svg           = d3.select("svg") // select the SVG from the DOM
                       .attr("width", size)  // adjust size
                       .attr("height", size) // adjust size
-                      .attr("transform", "translate(" + radius + "," + radius + ")") // move pie to center
-                      .attr("viewBox", -radius + ","+ -radius +"," + size + "," + size) // move pie to center
-                      .on("click", printSvg("svgOutput")), // setup debugging
+                      .attr("viewBox", -radius + ","+ -radius +"," + size + "," + size) // move pie to center                      .on("click", printSvg("svgOutput")), // setup debugging
     path          = svg.selectAll("g.sector path")
-                      .data(pie(currentDS), constancy)                     
+                      .data(pie(initialDS))
                       .attr("fill", function(d, i) {
-                        return color(i); })
+                        return color(i);
+                      })
                       .attr("d", arc)
                       .each(function(d) { // store the initial angles
                         this._current = d;
                       }),
     text          = svg.selectAll("text")
-                      .data(pie(currentDS), constancy)
+                      .data(pie(initialDS))
                       .attr("transform", moveText)
                       .text(setText)
-                      .attr("text-anchor", "middle") //center the text on it's origin
+                      .attr("text-anchor", "middle"); //center the text on it's origin
+  initialDS = null;
   // program
   var btnAnimate = d3.select("#btnAnimate")
     .on("click.animate", q(run))  // start animation and set start/stop function
@@ -41,7 +42,7 @@
       var t = toggle("Stop", "Start");
       return function() {
         this.value = t();
-      }
+      };
     }());
 
   d3.select("#svgOutput")
@@ -71,27 +72,18 @@
     return value === 100 ? "HIV infected 100%" : (value > 0 ? d.label + " " + d.value + "%" : "");
   }
 
-  /** 
-   * Object constancy
-   * http://bost.ocks.org/mike/constancy/
-   * http://mbostock.github.io/d3/tutorial/bar-2.html#object_constancy
-   */
-  function constancy(d, i) {
-    return (d && d.data && d.data.label) || currentDS[i].label;
-  }
-
   /**
    * Animation functions
    */
   function change() {
-    var data = currentDS = dataset[nextIndex()];
+    var data = dataset[nextIndex()];
     path
-      .data(pie(data), constancy)
+      .data(pie(data))
       .transition()
       .duration(1000)
       .attrTween("d", arcTween); // redraw the arcs
     text
-      .data(pie(data), constancy)
+      .data(pie(data))
       .transition()      
       .duration(1000)
       .attr("transform", moveText)
@@ -114,7 +106,7 @@
     d.outerRadius = radius;
     // // console.log("after adding in radius");
     // console.dir(d);
-    return "translate(" + arc.centroid(d) + ")"; //this gives us a pair of coordinates like [50, 50]
+    return "translate(" + arc.centroid(d) + ")";
   }
 
   /*           *
@@ -137,7 +129,7 @@
     return function() {
       win.clearInterval(id);
       return run;
-    }
+    };
   }
   // if a function returns a function, "q" will call the return function from a function call.
   // if a function returns something else, "q" will break everything
