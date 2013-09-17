@@ -19,7 +19,7 @@
                       .attr("width", size)  // adjust size
                       .attr("height", size) // adjust size
                       .attr("transform", "translate(" + radius + "," + radius + ")") // move pie to center
-                      .attr("viewBox", -radius + ","+ -radius +"," + size + "," + size)
+                      .attr("viewBox", -radius + ","+ -radius +"," + size + "," + size) // move pie to center
                       .on("click", printSvg("svgOutput")), // setup debugging
     path          = svg.selectAll("g.sector path")
                       .data(pie(currentDS), constancy)                     
