@@ -19,7 +19,8 @@
     svg           = d3.select("svg") // select the SVG from the DOM
                       .attr("width", size)  // adjust size
                       .attr("height", size) // adjust size
-                      .attr("viewBox", -radius + ","+ -radius +"," + size + "," + size), // move pie to center                      .on("click", printSvg("svgOutput")), // setup debugging
+                      .attr("viewBox", -radius + ","+ -radius +"," + size + "," + size) // move pie to center
+                      .on("click", printSvg("svgOutput")), // setup debugging
     path          = svg.selectAll("g.sector path")
                       .data(pie(initialDS))
                       .attr("fill", function(d, i) {
